@@ -24,6 +24,7 @@ def classify(classifier, feats):
             sum(-log(prob.get((cl,feat), 10**(-7))) for feat in feats))
 
 def getData():
+	#Было: PassengerId,Survived,Pclass,Name,Sex,Age,SibSp,Parch,Ticket,Fare,Cabin,Embarked
 	mf = open('train.csv','r')
 	rdr = csv.reader(mf, delimiter=',',quotechar='"')
 	data = []
@@ -31,7 +32,12 @@ def getData():
 	for row in rdr:
 		if row[5]=='':
 			row[5]='-1'
-		data.append(('class'+row[2],row[4], float(row[5]), int(row[1])))
+		sib = int(row[6])
+		parch = int(row[7])
+		family = 'notfamily'
+		if (sib !=0 or parch!=0):
+			family = 'family'
+		data.append(('class'+row[2],row[4], float(row[5]), family, int(row[1])))
 	return data
 
 def getTestData():
@@ -44,9 +50,14 @@ def getTestData():
 	for row in reader:
 		if row[4]=='':
 			row[4] = '-1'
-		result.append(('class'+row[1],row[3], float(row[4]), row[0]))
+		sib = int(row[5])
+		parch = int(row[6])
+		family = 'notfamily'
+		if (sib !=0 or parch!=0):
+			family = 'family'
+		result.append(('class'+row[1],row[3], float(row[4]), family, row[0]))
 	return result
-def getFeatures(sample): return (sample[0],sample[1],sample[2]) # get last letter
+def getFeatures(sample): return (sample[0],sample[1],sample[2],sample[3]) # get last letter
 
 data = getData()
 features = [(getFeatures(sample), sample[-1]) for sample in data]
